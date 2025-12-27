@@ -1,0 +1,598 @@
+[1mdiff --git a/02_ML_Algorithms.ipynb b/02_ML_Algorithms.ipynb[m
+[1mindex 1bf3e06..ee47215 100644[m
+[1m--- a/02_ML_Algorithms.ipynb[m
+[1m+++ b/02_ML_Algorithms.ipynb[m
+[36m@@ -1,10 +1,11 @@[m
+ {[m
+  "cells": [[m
+   {[m
+[31m-   "metadata": {},[m
+    "cell_type": "code",[m
+[32m+[m[32m   "execution_count": 2,[m
+[32m+[m[32m   "id": "4196d64f90f420bd",[m
+[32m+[m[32m   "metadata": {},[m
+    "outputs": [],[m
+[31m-   "execution_count": null,[m
+    "source": [[m
+     "import os\n",[m
+     "import shutil\n",[m
+[36m@@ -29,39 +30,84 @@[m
+     ")\n",[m
+     "\n",[m
+     "from pyspark.mllib.evaluation import BinaryClassificationMetrics\n"[m
+[31m-   ],[m
+[31m-   "id": "4196d64f90f420bd"[m
+[32m+[m[32m   ][m
+   },[m
+   {[m
+[31m-   "metadata": {},[m
+    "cell_type": "code",[m
+[31m-   "outputs": [],[m
+[31m-   "execution_count": null,[m
+[32m+[m[32m   "execution_count": 3,[m
+[32m+[m[32m   "id": "1711047a9d7ce43",[m
+[32m+[m[32m   "metadata": {},[m
+[32m+[m[32m   "outputs": [[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stderr",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "25/12/28 01:04:37 WARN Utils: Your hostname, spark resolves to a loopback address: 127.0.1.1; using 10.0.2.15 instead (on interface enp0s3)\n",[m
+[32m+[m[32m      "25/12/28 01:04:37 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address\n",[m
+[32m+[m[32m      "Setting default log level to \"WARN\".\n",[m
+[32m+[m[32m      "To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).\n",[m
+[32m+[m[32m      "25/12/28 01:04:38 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable\n",[m
+[32m+[m[32m      "25/12/28 01:04:40 WARN Utils: Service 'SparkUI' could not bind on port 4040. Attempting port 4041.\n"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    }[m
+[32m+[m[32m   ],[m
+    "source": [[m
+     "spark = SparkSession.builder \\\n",[m
+     "    .appName(\"AirlinesDelay-ML-Notebook\") \\\n",[m
+     "    .getOrCreate()\n",[m
+     "\n",[m
+     "sc = spark.sparkContext\n"[m
+[31m-   ],[m
+[31m-   "id": "1711047a9d7ce43"[m
+[32m+[m[32m   ][m
+   },[m
+   {[m
+[31m-   "metadata": {},[m
+    "cell_type": "code",[m
+[31m-   "outputs": [],[m
+    "execution_count": null,[m
+[31m-   "source": "",[m
+[31m-   "id": "34b760ffbf10a2ae"[m
+[32m+[m[32m   "id": "34b760ffbf10a2ae",[m
+[32m+[m[32m   "metadata": {},[m
+[32m+[m[32m   "outputs": [],[m
+[32m+[m[32m   "source": [][m
+   },[m
+   {[m
+    "cell_type": "code",[m
+[31m-   "execution_count": null,[m
+[32m+[m[32m   "execution_count": 4,[m
+    "id": "initial_id",[m
+[31m-   "metadata": {[m
+[31m-    "collapsed": true[m
+[31m-   },[m
+[31m-   "outputs": [],[m
+[32m+[m[32m   "metadata": {},[m
+[32m+[m[32m   "outputs": [[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stderr",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "                                                                                \r"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stdout",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "root\n",[m
+[32m+[m[32m      " |-- Flight: double (nullable = true)\n",[m
+[32m+[m[32m      " |-- Time: double (nullable = true)\n",[m
+[32m+[m[32m      " |-- Length: double (nullable = true)\n",[m
+[32m+[m[32m      " |-- Airline: string (nullable = true)\n",[m
+[32m+[m[32m      " |-- AirportFrom: string (nullable = true)\n",[m
+[32m+[m[32m      " |-- AirportTo: string (nullable = true)\n",[m
+[32m+[m[32m      " |-- DayOfWeek: integer (nullable = true)\n",[m
+[32m+[m[32m      " |-- Class: integer (nullable = true)\n",[m
+[32m+[m[32m      "\n",[m
+[32m+[m[32m      "+------+------+------+-------+-----------+---------+---------+-----+\n",[m
+[32m+[m[32m      "|Flight|Time  |Length|Airline|AirportFrom|AirportTo|DayOfWeek|Class|\n",[m
+[32m+[m[32m      "+------+------+------+-------+-----------+---------+---------+-----+\n",[m
+[32m+[m[32m      "|2313.0|1296.0|141.0 |DL     |ATL        |HOU      |1        |0    |\n",[m
+[32m+[m[32m      "|6948.0|360.0 |146.0 |OO     |COS        |ORD      |4        |0    |\n",[m
+[32m+[m[32m      "|1247.0|1170.0|143.0 |B6     |BOS        |CLT      |3        |0    |\n",[m
+[32m+[m[32m      "|31.0  |1410.0|344.0 |US     |OGG        |PHX      |6        |0    |\n",[m
+[32m+[m[32m      "|563.0 |692.0 |98.0  |FL     |BMI        |ATL      |4        |0    |\n",[m
+[32m+[m[32m      "+------+------+------+-------+-----------+---------+---------+-----+\n",[m
+[32m+[m[32m      "only showing top 5 rows\n",[m
+[32m+[m[32m      "\n"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    }[m
+[32m+[m[32m   ],[m
+    "source": [[m
+     "from pyspark.sql import functions as F\n",[m
+     "\n",[m
+[36m@@ -77,36 +123,152 @@[m
+    ][m
+   },[m
+   {[m
+[31m-   "metadata": {},[m
+    "cell_type": "code",[m
+[31m-   "outputs": [],[m
+[31m-   "execution_count": null,[m
+[32m+[m[32m   "execution_count": 5,[m
+[32m+[m[32m   "id": "74106f756791fecd",[m
+[32m+[m[32m   "metadata": {},[m
+[32m+[m[32m   "outputs": [[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stderr",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "                                                                                \r"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stdout",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "+-----+------+\n",[m
+[32m+[m[32m      "|Class| count|\n",[m
+[32m+[m[32m      "+-----+------+\n",[m
+[32m+[m[32m      "|    0|299118|\n",[m
+[32m+[m[32m      "|    1|240264|\n",[m
+[32m+[m[32m      "+-----+------+\n",[m
+[32m+[m[32m      "\n"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stderr",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "[Stage 6:=============================>                             (1 + 1) / 2]\r"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stdout",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "+------+----+------+-------+-----------+---------+---------+-----+\n",[m
+[32m+[m[32m      "|Flight|Time|Length|Airline|AirportFrom|AirportTo|DayOfWeek|Class|\n",[m
+[32m+[m[32m      "+------+----+------+-------+-----------+---------+---------+-----+\n",[m
+[32m+[m[32m      "|0     |0   |0     |0      |0          |0        |0        |0    |\n",[m
+[32m+[m[32m      "+------+----+------+-------+-----------+---------+---------+-----+\n",[m
+[32m+[m[32m      "\n"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stderr",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "                                                                                \r"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    }[m
+[32m+[m[32m   ],[m
+    "source": [[m
+     "df.select(\"Class\").groupBy(\"Class\").count().orderBy(\"Class\").show()\n",[m
+     "\n",[m
+     "# null var mı?\n",[m
+     "df.select([F.count(F.when(F.col(c).isNull(), c)).alias(c) for c in df.columns]).show(truncate=False)"[m
+[31m-   ],[m
+[31m-   "id": "74106f756791fecd"[m
+[32m+[m[32m   ][m
+   },[m
+   {[m
+[31m-   "metadata": {},[m
+    "cell_type": "code",[m
+[31m-   "outputs": [],[m
+[31m-   "execution_count": null,[m
+[32m+[m[32m   "execution_count": 6,[m
+[32m+[m[32m   "id": "242064a4aed14345",[m
+[32m+[m[32m   "metadata": {},[m
+[32m+[m[32m   "outputs": [[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stderr",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "                                                                                \r"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stdout",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "train: 431452\n"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stderr",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "[Stage 12:=============================>                            (1 + 1) / 2]\r"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stdout",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "test : 107930\n"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stderr",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "                                                                                \r"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    }[m
+[32m+[m[32m   ],[m
+    "source": [[m
+     "train_df, test_df = df.randomSplit([0.8, 0.2], seed=42)\n",[m
+     "\n",[m
+     "print(\"train:\", train_df.count())\n",[m
+     "print(\"test :\", test_df.count())\n"[m
+[31m-   ],[m
+[31m-   "id": "242064a4aed14345"[m
+[32m+[m[32m   ][m
+   },[m
+   {[m
+[31m-   "metadata": {},[m
+    "cell_type": "code",[m
+[31m-   "outputs": [],[m
+[31m-   "execution_count": null,[m
+[32m+[m[32m   "execution_count": 7,[m
+[32m+[m[32m   "id": "b3c9e904f8fb97d0",[m
+[32m+[m[32m   "metadata": {},[m
+[32m+[m[32m   "outputs": [[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stderr",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "[Stage 58:>                                                         (0 + 1) / 1]\r"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stdout",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "+-----------------------------------------------------+-----+----------------------------------------+----------+\n",[m
+[32m+[m[32m      "|features                                             |Class|probability                             |prediction|\n",[m
+[32m+[m[32m      "+-----------------------------------------------------+-----+----------------------------------------+----------+\n",[m
+[32m+[m[32m      "|(610,[0,1,2,3,61,349],[420.0,60.0,2.0,1.0,1.0,1.0])  |0    |[0.3395888788122727,0.6604111211877273] |1.0       |\n",[m
+[32m+[m[32m      "|(610,[0,1,2,3,61,349],[420.0,60.0,3.0,1.0,1.0,1.0])  |1    |[0.3463468441791904,0.6536531558208096] |1.0       |\n",[m
+[32m+[m[32m      "|(610,[0,1,2,3,61,349],[420.0,60.0,4.0,1.0,1.0,1.0])  |0    |[0.3531673768059933,0.6468326231940067] |1.0       |\n",[m
+[32m+[m[32m      "|(610,[0,1,2,3,61,349],[420.0,60.0,5.0,1.0,1.0,1.0])  |0    |[0.36004824054148676,0.6399517594585132]|1.0       |\n",[m
+[32m+[m[32m      "|(610,[0,1,2,18,44,335],[480.0,355.0,3.0,1.0,1.0,1.0])|0    |[0.7174543893144946,0.28254561068550543]|0.0       |\n",[m
+[32m+[m[32m      "+-----------------------------------------------------+-----+----------------------------------------+----------+\n",[m
+[32m+[m[32m      "only showing top 5 rows\n",[m
+[32m+[m[32m      "\n"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stderr",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "                                                                                \r"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    }[m
+[32m+[m[32m   ],[m
+    "source": [[m
+     "from pyspark.ml import Pipeline\n",[m
+     "from pyspark.ml.feature import StringIndexer, OneHotEncoder, VectorAssembler\n",[m
+[36m@@ -138,14 +300,58 @@[m
+     "pred_lr = model_lr.transform(test_df)\n",[m
+     "\n",[m
+     "pred_lr.select(\"features\", \"Class\", \"probability\", \"prediction\").show(5, truncate=False)\n"[m
+[31m-   ],[m
+[31m-   "id": "b3c9e904f8fb97d0"[m
+[32m+[m[32m   ][m
+   },[m
+   {[m
+[31m-   "metadata": {},[m
+    "cell_type": "code",[m
+[31m-   "outputs": [],[m
+[31m-   "execution_count": null,[m
+[32m+[m[32m   "execution_count": 8,[m
+[32m+[m[32m   "id": "23a361a4e7050bf7",[m
+[32m+[m[32m   "metadata": {},[m
+[32m+[m[32m   "outputs": [[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stderr",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "                                                                                \r"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stdout",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "LogReg -> accuracy: 0.645844528861299\n",[m
+[32m+[m[32m      "LogReg -> f1      : 0.6377829556309456\n",[m
+[32m+[m[32m      "LogReg -> AUC     : 0.69037677107429\n"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stderr",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "[Stage 74:=============================>                            (1 + 1) / 2]\r"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stdout",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "+-----+-----+-----+\n",[m
+[32m+[m[32m      "|Class|  0.0|  1.0|\n",[m
+[32m+[m[32m      "+-----+-----+-----+\n",[m
+[32m+[m[32m      "|    1|24623|23369|\n",[m
+[32m+[m[32m      "|    0|46337|13601|\n",[m
+[32m+[m[32m      "+-----+-----+-----+\n",[m
+[32m+[m[32m      "\n"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stderr",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "                                                                                \r"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    }[m
+[32m+[m[32m   ],[m
+    "source": [[m
+     "from pyspark.ml.evaluation import MulticlassClassificationEvaluator, BinaryClassificationEvaluator\n",[m
+     "\n",[m
+[36m@@ -169,30 +375,88 @@[m
+     "      .na.fill(0)\n",[m
+     "     )\n",[m
+     "cm.show()\n"[m
+[31m-   ],[m
+[31m-   "id": "23a361a4e7050bf7"[m
+[32m+[m[32m   ][m
+   },[m
+   {[m
+[31m-   "metadata": {},[m
+    "cell_type": "code",[m
+[31m-   "outputs": [],[m
+[31m-   "execution_count": null,[m
+[32m+[m[32m   "execution_count": 11,[m
+[32m+[m[32m   "id": "24d5943a5466d045",[m
+[32m+[m[32m   "metadata": {},[m
+[32m+[m[32m   "outputs": [[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stderr",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "                                                                                \r"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stdout",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "Manual AUC: 0.6903769700978056\n"[m
+[32m+[m[32m     ][m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "data": {[m
+[32m+[m[32m      "image/png": "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",[m
+[32m+[m[32m      "text/plain": [[m
+[32m+[m[32m       "<Figure size 640x480 with 1 Axes>"[m
+[32m+[m[32m      ][m
+[32m+[m[32m     },[m
+[32m+[m[32m     "metadata": {},[m
+[32m+[m[32m     "output_type": "display_data"[m
+[32m+[m[32m    }[m
+[32m+[m[32m   ],[m
+    "source": [[m
+[31m-    "from pyspark.mllib.evaluation import BinaryClassificationMetrics\n",[m
+[32m+[m[32m    "from pyspark.ml.functions import vector_to_array\n",[m
+[32m+[m[32m    "from pyspark.sql import functions as F\n",[m
+     "import matplotlib.pyplot as plt\n",[m
+     "\n",[m
+[31m-    "# (score, label) -> score: P(Class=1)\n",[m
+[31m-    "score_and_labels = pred_lr.select(\n",[m
+[31m-    "    F.col(\"probability\").getItem(1).alias(\"score\"),\n",[m
+[31m-    "    F.col(\"Class\").cast(\"double\").alias(\"label\")\n",[m
+[31m-    ").rdd.map(lambda r: (float(r[\"score\"]), float(r[\"label\"])))\n",[m
+[32m+[m[32m    "# 1) score = P(Class=1) çıkar\n",[m
+[32m+[m[32m    "pred_for_roc = pred_lr.select(\n",[m
+[32m+[m[32m    "    vector_to_array(\"probability\")[1].alias(\"score\"),\n",[m
+[32m+[m[32m    "    F.col(\"Class\").cast(\"int\").alias(\"label\")\n",[m
+[32m+[m[32m    ")\n",[m
+[32m+[m[32m    "\n",[m
+[32m+[m[32m    "# Çok büyükse RAM'i zorlamasın diye sample açabilirsin:\n",[m
+[32m+[m[32m    "# pred_for_roc = pred_for_roc.sample(False, 0.3, seed=42)\n",[m
+[32m+[m[32m    "\n",[m
+[32m+[m[32m    "# 2) Driver'a al\n",[m
+[32m+[m[32m    "pairs = pred_for_roc.rdd.map(lambda r: (float(r[\"score\"]), int(r[\"label\"]))).collect()\n",[m
+[32m+[m[32m    "\n",[m
+[32m+[m[32m    "# 3) ROC hesapla (manuel, sklearn gerektirmez)\n",[m
+[32m+[m[32m    "pairs.sort(key=lambda x: -x[0])  # score desc\n",[m
+     "\n",[m
+[31m-    "metrics = BinaryClassificationMetrics(score_and_labels)\n",[m
+[31m-    "roc = metrics.roc().collect()  # [(FPR, TPR), ...]\n",[m
+[32m+[m[32m    "P = sum(l for _, l in pairs)\n",[m
+[32m+[m[32m    "N = len(pairs) - P\n",[m
+     "\n",[m
+[31m-    "fpr = [p[0] for p in roc]\n",[m
+[31m-    "tpr = [p[1] for p in roc]\n",[m
+[32m+[m[32m    "tp = fp = 0\n",[m
+[32m+[m[32m    "prev_score = None\n",[m
+[32m+[m[32m    "roc_points = [(0.0, 0.0)]  # (FPR, TPR)\n",[m
+     "\n",[m
+[32m+[m[32m    "for score, label in pairs:\n",[m
+[32m+[m[32m    "    if prev_score is not None and score != prev_score:\n",[m
+[32m+[m[32m    "        roc_points.append((fp / N if N else 0.0, tp / P if P else 0.0))\n",[m
+[32m+[m[32m    "    if label == 1:\n",[m
+[32m+[m[32m    "        tp += 1\n",[m
+[32m+[m[32m    "    else:\n",[m
+[32m+[m[32m    "        fp += 1\n",[m
+[32m+[m[32m    "    prev_score = score\n",[m
+[32m+[m[32m    "\n",[m
+[32m+[m[32m    "roc_points.append((fp / N if N else 0.0, tp / P if P else 0.0))\n",[m
+[32m+[m[32m    "\n",[m
+[32m+[m[32m    "fpr = [p[0] for p in roc_points]\n",[m
+[32m+[m[32m    "tpr = [p[1] for p in roc_points]\n",[m
+[32m+[m[32m    "\n",[m
+[32m+[m[32m    "# 4) AUC (trapezoid)\n",[m
+[32m+[m[32m    "auc_manual = 0.0\n",[m
+[32m+[m[32m    "for i in range(1, len(fpr)):\n",[m
+[32m+[m[32m    "    auc_manual += (fpr[i] - fpr[i-1]) * (tpr[i] + tpr[i-1]) / 2.0\n",[m
+[32m+[m[32m    "\n",[m
+[32m+[m[32m    "print(\"Manual AUC:\", auc_manual)\n",[m
+[32m+[m[32m    "\n",[m
+[32m+[m[32m    "# 5) Plot\n",[m
+     "plt.figure()\n",[m
+     "plt.plot(fpr, tpr)\n",[m
+     "plt.xlabel(\"False Positive Rate\")\n",[m
+[36m@@ -200,14 +464,1777 @@[m
+     "plt.title(\"ROC Curve (Logistic Regression)\")\n",[m
+     "plt.grid(True)\n",[m
+     "plt.show()\n"[m
+[31m-   ],[m
+[31m-   "id": "24d5943a5466d045"[m
+[32m+[m[32m   ][m
+   },[m
+   {[m
+[31m-   "metadata": {},[m
+    "cell_type": "code",[m
+[31m-   "outputs": [],[m
+[31m-   "execution_count": null,[m
+[32m+[m[32m   "execution_count": 12,[m
+[32m+[m[32m   "id": "ae595c773551bc00",[m
+[32m+[m[32m   "metadata": {},[m
+[32m+[m[32m   "outputs": [[m
+[32m+[m[32m    {[m
+[32m+[m[32m     "name": "stderr",[m
+[32m+[m[32m     "output_type": "stream",[m
+[32m+[m[32m     "text": [[m
+[32m+[m[32m      "25/12/28 01:11:09 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 72.3 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:09 WARN BlockManager: Persisting block rdd_253_0 to disk instead.\n",[m
+[32m+[m[32m      "25/12/28 01:11:10 WARN MemoryStore: Not enough space to cache rdd_253_1 in memory! (computed 258.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:10 WARN BlockManager: Persisting block rdd_253_1 to disk instead.\n",[m
+[32m+[m[32m      "25/12/28 01:11:14 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_255_1 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:11:14 WARN MemoryStore: Not enough space to cache rdd_255_1 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:14 WARN BlockManager: Persisting block rdd_255_1 to disk instead.\n",[m
+[32m+[m[32m      "25/12/28 01:11:14 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_255_1 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:11:14 WARN MemoryStore: Not enough space to cache rdd_255_1 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:17 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 32.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:17 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 8.7 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:21 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 171.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:24 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 32.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:26 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 32.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:30 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 32.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:32 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 32.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:32 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 3.8 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:32 WARN MemoryStore: Not enough space to cache rdd_273_1 in memory! (computed 3.7 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:32 WARN BlockManager: Persisting block rdd_273_1 to disk instead.\n",[m
+[32m+[m[32m      "25/12/28 01:11:32 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 1092.5 KiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:32 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_273_0 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:11:32 WARN MemoryStore: Not enough space to cache rdd_273_0 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:32 WARN BlockManager: Persisting block rdd_273_0 to disk instead.\n",[m
+[32m+[m[32m      "25/12/28 01:11:33 WARN MemoryStore: Not enough space to cache rdd_273_1 in memory! (computed 3.7 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:33 WARN MemoryStore: Not enough space to cache rdd_276_1 in memory! (computed 1024.6 KiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:33 WARN BlockManager: Persisting block rdd_276_1 to disk instead.\n",[m
+[32m+[m[32m      "25/12/28 01:11:34 WARN MemoryStore: Not enough space to cache rdd_276_1 in memory! (computed 4.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:34 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block broadcast_154 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:11:34 WARN MemoryStore: Not enough space to cache broadcast_154 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:38 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 258.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:39 WARN MemoryStore: Not enough space to cache rdd_253_1 in memory! (computed 171.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:39 WARN MemoryStore: Not enough space to cache rdd_276_1 in memory! (computed 4.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:42 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 171.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:42 WARN MemoryStore: Not enough space to cache rdd_253_1 in memory! (computed 258.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:42 WARN MemoryStore: Not enough space to cache rdd_276_1 in memory! (computed 4.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:45 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 171.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:48 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 32.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:48 WARN MemoryStore: Not enough space to cache rdd_276_0 in memory! (computed 2.7 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:52 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 32.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:52 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_253_0 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:11:52 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:52 WARN MemoryStore: Not enough space to cache rdd_295_1 in memory! (computed 1035.4 KiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:52 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_253_0 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:11:52 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:52 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_273_0 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:11:52 WARN MemoryStore: Not enough space to cache rdd_273_0 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:52 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_295_0 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:11:52 WARN MemoryStore: Not enough space to cache rdd_295_0 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:52 WARN BlockManager: Persisting block rdd_295_0 to disk instead.\n",[m
+[32m+[m[32m      "25/12/28 01:11:52 WARN BlockManager: Persisting block rdd_295_1 to disk instead.\n",[m
+[32m+[m[32m      "25/12/28 01:11:53 WARN MemoryStore: Not enough space to cache rdd_298_1 in memory! (computed 1024.6 KiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:11:53 WARN BlockManager: Persisting block rdd_298_1 to disk instead.\n",[m
+[32m+[m[32m      "25/12/28 01:12:00 WARN MemoryStore: Not enough space to cache rdd_253_1 in memory! (computed 171.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:00 WARN MemoryStore: Not enough space to cache rdd_298_1 in memory! (computed 4.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:00 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 258.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:03 WARN MemoryStore: Not enough space to cache rdd_253_1 in memory! (computed 258.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:04 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 171.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:04 WARN MemoryStore: Not enough space to cache rdd_298_1 in memory! (computed 4.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:06 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 171.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:07 WARN MemoryStore: Not enough space to cache rdd_253_1 in memory! (computed 258.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:10 WARN MemoryStore: Not enough space to cache rdd_253_1 in memory! (computed 171.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:11 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 387.8 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:13 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 171.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:13 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 13.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:14 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_253_0 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:12:14 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:14 WARN MemoryStore: Not enough space to cache rdd_253_1 in memory! (computed 258.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:14 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_295_0 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:12:14 WARN MemoryStore: Not enough space to cache rdd_295_0 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:14 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_317_0 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:12:14 WARN MemoryStore: Not enough space to cache rdd_317_0 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:14 WARN BlockManager: Persisting block rdd_317_0 to disk instead.\n",[m
+[32m+[m[32m      "25/12/28 01:12:14 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_253_1 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:12:14 WARN MemoryStore: Not enough space to cache rdd_253_1 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:14 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_253_1 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:12:14 WARN MemoryStore: Not enough space to cache rdd_253_1 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:14 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_295_1 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:12:14 WARN MemoryStore: Not enough space to cache rdd_295_1 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:14 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_317_1 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:12:14 WARN MemoryStore: Not enough space to cache rdd_317_1 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:14 WARN BlockManager: Persisting block rdd_317_1 to disk instead.\n",[m
+[32m+[m[32m      "25/12/28 01:12:16 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_317_0 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:12:16 WARN MemoryStore: Not enough space to cache rdd_317_0 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:16 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_320_0 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:12:16 WARN MemoryStore: Not enough space to cache rdd_320_0 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:16 WARN BlockManager: Persisting block rdd_320_0 to disk instead.\n",[m
+[32m+[m[32m      "25/12/28 01:12:22 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 171.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:22 WARN MemoryStore: Not enough space to cache rdd_253_1 in memory! (computed 258.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:25 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 171.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:26 WARN MemoryStore: Not enough space to cache rdd_320_0 in memory! (computed 6.2 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:26 WARN MemoryStore: Not enough space to cache rdd_253_1 in memory! (computed 258.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:29 WARN MemoryStore: Not enough space to cache rdd_253_1 in memory! (computed 171.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:30 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 387.8 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:32 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 171.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:35 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 32.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:35 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 2.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:35 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_253_0 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:12:35 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:35 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_317_0 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:12:35 WARN MemoryStore: Not enough space to cache rdd_317_0 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:35 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_339_0 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:12:35 WARN MemoryStore: Not enough space to cache rdd_339_0 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:35 WARN BlockManager: Persisting block rdd_339_0 to disk instead.\n",[m
+[32m+[m[32m      "25/12/28 01:12:35 WARN MemoryStore: Not enough space to cache rdd_317_1 in memory! (computed 5.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:35 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_339_1 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:12:35 WARN MemoryStore: Not enough space to cache rdd_339_1 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:35 WARN BlockManager: Persisting block rdd_339_1 to disk instead.\n",[m
+[32m+[m[32m      "25/12/28 01:12:36 WARN MemoryStore: Not enough space to cache rdd_339_1 in memory! (computed 5.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:36 WARN MemoryStore: Failed to reserve initial memory threshold of 1024.0 KiB for computing block rdd_342_1 in memory.\n",[m
+[32m+[m[32m      "25/12/28 01:12:36 WARN MemoryStore: Not enough space to cache rdd_342_1 in memory! (computed 384.0 B so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:36 WARN BlockManager: Persisting block rdd_342_1 to disk instead.\n",[m
+[32m+[m[32m      "25/12/28 01:12:36 WARN MemoryStore: Not enough space to cache rdd_342_1 in memory! (computed 4.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:44 WARN MemoryStore: Not enough space to cache rdd_253_1 in memory! (computed 171.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:44 WARN MemoryStore: Not enough space to cache rdd_342_1 in memory! (computed 4.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:44 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 258.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:48 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 258.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:48 WARN MemoryStore: Not enough space to cache rdd_253_1 in memory! (computed 171.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:48 WARN MemoryStore: Not enough space to cache rdd_342_1 in memory! (computed 4.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:52 WARN MemoryStore: Not enough space to cache rdd_253_1 in memory! (computed 171.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:52 WARN MemoryStore: Not enough space to cache rdd_342_1 in memory! (computed 4.0 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:52 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 258.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:56 WARN MemoryStore: Not enough space to cache rdd_253_1 in memory! (computed 258.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:12:57 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 171.5 MiB so far)\n",[m
+[32m+[m[32m      "25/12/28 01:13:01 WARN MemoryStore: Not enough space to cache rdd_253_0 in memory! (computed 171.5 MiB so far
